@@ -21,9 +21,9 @@ module Map where
 			toInt _		   = -1
 
 	getRoomAtIndex :: (Int,Int) -> Map -> Maybe Room
-	getRoomAtIndex iii m
-		| fst iii < 0 || snd iii < 0 = Nothing
-		| otherwise					 = Just $ (!!) ((!!) (matrix m) (fst iii)) (snd iii)
+	getRoomAtIndex (row,col) m
+		| row < 0 || col < 0 || row >= (length $ matrix m) || col >= (length $ (!!) (matrix m) row) = Nothing
+		| otherwise					 = Just $ (!!) ((!!) (matrix m) row) col
 
 	getRoomById :: Int -> Map -> Room
 	getRoomById  rid m = toRoom $ getRoomAtIndex (getRoomIndex rid m) m
@@ -61,7 +61,8 @@ module Map where
 				| otherwise						 = ((fst iii, snd iii - 1),('e','w')) --west
 			branch newIndex bp dir
 				| fst newIndex < 0 || snd newIndex < 0 || fst newIndex >= maxBounds || snd newIndex >= maxBounds = genMap n iii bpass m
-				| otherwise							   = genMap n newIndex bp $ addRoomAtIndex iii (buildRoom (getNumRooms m) (mergePassage (||) (setSinglePassage bpass) (setSinglePassage dir)) []) m
+				| getNumRooms m == n-1 && (toRoom $ getRoomAtIndex iii m) == buildEmptyRoom = addRoomAtIndex iii (buildRoom (getNumRooms m) (setSinglePassage bpass) []) m
+				| otherwise			   = genMap n newIndex bp $ addRoomAtIndex iii (buildRoom (getNumRooms m) (mergePassage (||) (setSinglePassage bpass) (setSinglePassage dir)) []) m
 
 	getAdjRooms :: Room -> Map -> [Room]
 	getAdjRooms r m = map toRoom $ filter (/=Nothing) $ map getRoomAtPassage [(0,0),(0,1),(0,2),(1,0),(1,1),(1,2),(2,0),(2,1),(2,2)]
