@@ -1,23 +1,9 @@
-module Player (arrows,location,sense) where
-	
-	import Map
-	import Room
-	import Data.List(nub)
+module Player (Player,player,arrows,pLocation) where
 
-	data Player = Player {arrows :: Int, location :: Int}
+	data Player = Player {arrows :: Int, pLocation :: Int}
 
-	sense :: Player -> Map -> String
-	sense p m = getDesc $ nub $ concat $ map contents nextRooms
-		where
-			nextRooms = getAdjRooms (getRoomById (location p) m) m
-			getDesc (c:cs) = 
-				case c of
-					0 -> "You feel a soft breeze eminating from somewhere in the caverns. " ++ getDesc cs
-					1 -> "A flapping sound echoes through the tunnels. " ++ getDesc cs
-					2 -> "A malodorous stench lingers in the cave. " ++ getDesc cs
-					_ -> "" ++ getDesc cs
-			getDesc _ = ""
+	player :: Int -> Int -> Player
+	player arrs loc = Player arrs loc
 
-	--move :: Player -> Map -> String -> Player
-
-	--shoot :: Player -> Map -> String -> (Player,Map)
+	instance Show Player where
+		show a = "<P arrows: " ++ (show $ arrows a) ++ ",location: " ++ (show $ pLocation a) ++ ">" 

@@ -2,8 +2,7 @@ module Map where
 
 	import Room
 	import Data.List(findIndex,elemIndex)
-	import System.Random(randomRIO)
-	import System.IO.Unsafe(unsafePerformIO)
+	import Utility(randBetween,toRoom)
 
 	data Map = Map {matrix :: [[Room]]}
 
@@ -29,6 +28,9 @@ module Map where
 	getRoomById :: Int -> Map -> Room
 	getRoomById  rid m = toRoom $ getRoomAtIndex (getRoomIndex rid m) m
 
+	getRoomsAsList :: Map -> [Room]
+	getRoomsAsList m = filter (/=buildEmptyRoom) $ concat $ matrix m
+
 	addRoomAtIndex :: (Int,Int) -> Room -> Map -> Map
 	addRoomAtIndex iii r m
 		| length (matrix m) <= fst iii 					= addRoomAtIndex iii r $ addRows (matrix m)
@@ -38,9 +40,6 @@ module Map where
 			addToRow rs = take (snd iii) rs ++ [toRoom $ mergeRoom (toRoom $ getRoomAtIndex iii m) r] ++ drop (snd iii + 1) rs
 			addRows matr = Map $ matr ++ (replicate (fst iii - length matr + 1) [])
 			addCols row = Map $ take (fst iii) (matrix m) ++ [row ++ (replicate (snd iii - length row + 1) buildEmptyRoom)] ++ drop (fst iii + 1) (matrix m)
-
-	randBetween :: (Int,Int) -> Int
-	randBetween range = unsafePerformIO $ randomRIO (fst range, snd range) :: Int
 
 	generateMap :: Int -> Map
 	generateMap n 
@@ -80,27 +79,3 @@ module Map where
 			where
 				display (x:xs) = (show x) ++ "\n" ++ display xs
 				display _	   = "" 
-
-	toRoom :: Maybe Room -> Room
-	toRoom (Just a) = a
-	toRoom _		= buildEmptyRoom
-
-{- BROKEN MAP GEN CODE -- KEPT ONLY FOR REFERENCE
-
-| getNumRooms m == n-1 			  	   = genMap n newIndex bp $ addRoomAtIndex iii (buildRoom (getNumRooms m) (setSinglePassage bpass) []) m
-	genMap :: Int -> (Int,Int) -> Char -> Map -> Map
-	genMap n iii bpass m 
-		| n == getNumRooms m 			 = m
-		| randNum <= 100 && randNum > 75 = branch (fst iii - 1, snd iii) 's' 'n' --up
-		| randNum <= 75 && randNum > 50  = branch (fst iii, snd iii + 1) 'w' 'e' --right
-		| randNum <= 50 && randNum > 25  = branch (fst iii + 1, snd iii) 'n' 's' --down
-		| randNum <= 25 && randNum > 0   = branch (fst iii, snd iii -1)  'e' 'w' --left
-		| otherwise						 = error "Out of bounds."
-		where
-			randNum = randBetween (1,100)
-			branch i bp dir 
-				| fst i < 0 || snd i < 0 = genMap n iii bpass m
-				| getNumRooms m == 1     = genMap n i bp $ addRoomAtIndex iii (buildRoom (getNumRooms m) (mergePassage (setSinglePassage bpass) (setSinglePassage dir)) []) m
-				| getNumRooms m == n-1   = genMap n i bp $ addRoomAtIndex iii (buildRoom (getNumRooms m) (setSinglePassage bp) []) m
-				| otherwise		         = genMap n i bp $ addRoomAtIndex iii (buildRoom (getNumRooms m) (mergePassage (setSinglePassage bp) (setSinglePassage dir)) []) m
--}

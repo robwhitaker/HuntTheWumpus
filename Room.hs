@@ -1,10 +1,10 @@
-module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSinglePassage,mergePassage) where 
+module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSinglePassage,mergePassage,getPassAsStr) where 
 
 	import Data.List(nub)
 
 	type Passage = [[Bool]]
 
-	--Contents key: 0 - bottomless pit, 1 - bats, 2 - wumpus
+	--Contents key: 0 - bottomless pit, 1 - bats
 	data Room = Room {r_id :: Int, passage :: Passage, contents :: [Int]} deriving (Eq)
 
 	buildRoom :: Int -> Passage -> [Int] -> Room
@@ -45,12 +45,15 @@ module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSi
 	unsetSinglePassage :: Char -> Passage
 	unsetSinglePassage c = map (map not) $ setSinglePassage c
 
+	getPassAsStr :: Room -> String
+	getPassAsStr r = (concat $ map getPassAtIndex [(0,1),(1,0),(1,2),(2,1)])
+		where 
+			p = passage r
+			getPassAtIndex iii | iii == (0,1) && ((!!) ((!!) p (fst iii)) (snd iii)) = "n"
+							   | iii == (1,0) && ((!!) ((!!) p (fst iii)) (snd iii)) = "w"
+							   | iii == (1,2) && ((!!) ((!!) p (fst iii)) (snd iii)) = "e"
+							   | iii == (2,1) && ((!!) ((!!) p (fst iii)) (snd iii)) = "s"
+							   | otherwise    = ""  
+
 	instance Show Room where
-		show a = "<id:" ++ (show $ r_id a) ++ "," ++ "pass:" ++ getPassAtIndex (0,1) ++ getPassAtIndex (1,0) ++ getPassAtIndex (1,2) ++ getPassAtIndex (2,1) ++ ">"
-			where 
-				p = passage a
-				getPassAtIndex iii | iii == (0,1) && ((!!) ((!!) p (fst iii)) (snd iii)) = "n"
-								   | iii == (1,0) && ((!!) ((!!) p (fst iii)) (snd iii)) = "w"
-								   | iii == (1,2) && ((!!) ((!!) p (fst iii)) (snd iii)) = "e"
-								   | iii == (2,1) && ((!!) ((!!) p (fst iii)) (snd iii)) = "s"
-								   | otherwise    = ""  
+		show a = "<id:" ++ (show $ r_id a) ++ "," ++ "pass:" ++ getPassAsStr a ++ ">"
