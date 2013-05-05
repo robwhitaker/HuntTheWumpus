@@ -1,6 +1,6 @@
-module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSinglePassage,mergePassage,getPassAsStr) where 
+module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSinglePassage,mergePassage,getPassAsStr,getPassageText) where 
 
-	import Data.List(nub)
+	import Data.List(nub,intersperse)
 
 	type Passage = [[Bool]]
 
@@ -45,6 +45,34 @@ module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSi
 	unsetSinglePassage :: Char -> Passage
 	unsetSinglePassage c = map (map not) $ setSinglePassage c
 
+	-- returns a list of the full names of passages (North, South, East, West)
+	getFullPassList :: Room -> [String]
+	getFullPassList r = filter (/="") $ buildList $ getPassAsStr r
+		where
+			buildList (p:ps) =
+				case p of
+					'n' -> "North" : buildList ps
+					's' -> "South" : buildList ps
+					'e' -> "East" : buildList ps
+					'w' -> "West" : buildList ps
+					_ 	-> [""]  
+			buildList _ = [""]
+
+	getPassageText :: Room -> String
+	getPassageText r
+		| numPass == 1 = ("There is a passage to the " ++ (head passages) ++ ".")
+		| numPass == 2 = ("There are passages to the " ++ (head passages) ++ " and " ++ (last passages) ++ ".")
+		| otherwise	   = ("There are passages to the " ++ (getPText passages) ++ ".")
+		where
+			passages = getFullPassList r
+			numPass = length passages
+			getPText (p:ps) 
+				| null ps 	= ("and " ++ p) 
+				| otherwise = (p ++ ", " ++ getPText ps)
+			getPText _  = ""
+
+
+
 	getPassAsStr :: Room -> String
 	getPassAsStr r = (concat $ map getPassAtIndex [(0,1),(1,0),(1,2),(2,1)])
 		where 
@@ -56,4 +84,4 @@ module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSi
 							   | otherwise    = ""  
 
 	instance Show Room where
-		show a = "<id:" ++ (show $ r_id a) ++ "," ++ "pass:" ++ getPassAsStr a ++ ">"
+		show a = "<id:" ++ (show $ r_id a) ++ "," ++ "pass:" ++ getPassAsStr a ++ ",[" ++ ( intersperse ','$ concat $ map show (contents a) ) ++ "]>"
