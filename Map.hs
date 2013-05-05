@@ -44,7 +44,7 @@ module Map where
 	generateMap :: Int -> Map
 	generateMap n 
 		| n < 2     = error "Game must contain two or more rooms."
-		| otherwise = genMap n (0,0) 'x' $ Map [[buildEmptyRoom]] 
+		| otherwise = addTraps (genMap n (0,0) 'x' $ Map [[buildEmptyRoom]]) 1
 
 	genMap :: Int ->(Int,Int) -> Char -> Map -> Map
 	genMap n iii bpass m
@@ -63,6 +63,17 @@ module Map where
 				| fst newIndex < 0 || snd newIndex < 0 || fst newIndex >= maxBounds || snd newIndex >= maxBounds = genMap n iii bpass m
 				| getNumRooms m == n-1 && (toRoom $ getRoomAtIndex iii m) == buildEmptyRoom = addRoomAtIndex iii (buildRoom (getNumRooms m) (setSinglePassage bpass) []) m
 				| otherwise			   = genMap n newIndex bp $ addRoomAtIndex iii (buildRoom (getNumRooms m) (mergePassage (||) (setSinglePassage bpass) (setSinglePassage dir)) []) m
+
+	addTraps :: Map -> Int -> Map
+	addTraps gMap diff = Map $ map (map trap) (matrix gMap)
+		where
+			trap r
+				| r_id r <= 0 = r
+				| randN <= 15 && randN > 0  = toRoom $ mergeRoom r (buildRoom (-1) (setSinglePassage 'x') [0])
+				| randN <= 35 && randN > 15 = toRoom $ mergeRoom r (buildRoom (-1) (setSinglePassage 'x') [1])
+				| otherwise = r
+				where
+					randN = randBetween (1,100)
 
 	getAdjRooms :: Room -> Map -> [Room]
 	getAdjRooms r m = map toRoom $ filter (/=Nothing) $ map getRoomAtPassage [(0,0),(0,1),(0,2),(1,0),(1,1),(1,2),(2,0),(2,1),(2,2)]
