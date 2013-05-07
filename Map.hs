@@ -41,10 +41,10 @@ module Map where
 			addRows matr = Map $ matr ++ (replicate (fst iii - length matr + 1) [])
 			addCols row = Map $ take (fst iii) (matrix m) ++ [row ++ (replicate (snd iii - length row + 1) buildEmptyRoom)] ++ drop (fst iii + 1) (matrix m)
 
-	generateMap :: Int -> Map
-	generateMap n 
+	generateMap :: Int -> Int -> Map
+	generateMap n diff
 		| n < 2     = error "Game must contain two or more rooms."
-		| otherwise = addTraps (genMap n (0,0) 'x' $ Map [[buildEmptyRoom]]) 1
+		| otherwise = addTraps (genMap n (0,0) 'x' $ Map [[buildEmptyRoom]]) diff
 
 	genMap :: Int ->(Int,Int) -> Char -> Map -> Map
 	genMap n iii bpass m
@@ -67,13 +67,13 @@ module Map where
 	addTraps :: Map -> Int -> Map
 	addTraps gMap diff = Map $ map (map trap) (matrix gMap)
 		where
-			trap r
+			trap r 
 				| r_id r <= 0 = r
-				| randN <= 15 && randN > 0  = toRoom $ mergeRoom r (buildRoom (-1) (setSinglePassage 'x') [0])
-				| randN <= 35 && randN > 15 = toRoom $ mergeRoom r (buildRoom (-1) (setSinglePassage 'x') [1])
-				| otherwise = r
+				| otherwise	  = toRoom $ mergeRoom getBats getPit
 				where
 					randN = randBetween (1,100)
+					getPit  = if (randN <= 10 + (diff * 12) && randN > 0) then (toRoom $ mergeRoom r (buildRoom (-1) (setSinglePassage 'x') [0])) else r
+					getBats = if (randN <= 100 && randN > 95 - (diff * 5)) then (toRoom $ mergeRoom r (buildRoom (-1) (setSinglePassage 'x') [1])) else r
 
 	getAdjRooms :: Room -> Map -> [Room]
 	getAdjRooms r m = map toRoom $ filter (/=Nothing) $ map getRoomAtPassage [(0,0),(0,1),(0,2),(1,0),(1,1),(1,2),(2,0),(2,1),(2,2)]
