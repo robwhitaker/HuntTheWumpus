@@ -1,4 +1,4 @@
-module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSinglePassage,mergePassage,getPassAsStr,getPassageText) where 
+module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSinglePassage,mergePassage,getPassAsStr,getPassageText,charDirToStr) where 
 
 	import Data.List(nub,intersperse)
 
@@ -47,16 +47,15 @@ module Room (Room,buildRoom,buildEmptyRoom,mergeRoom,r_id,passage,contents,setSi
 
 	-- returns a list of the full names of passages (North, South, East, West)
 	getFullPassList :: Room -> [String]
-	getFullPassList r = filter (/="") $ buildList $ getPassAsStr r
-		where
-			buildList (p:ps) =
-				case p of
-					'n' -> "North" : buildList ps
-					's' -> "South" : buildList ps
-					'e' -> "East" : buildList ps
-					'w' -> "West" : buildList ps
-					_ 	-> [""]  
-			buildList _ = [""]
+	getFullPassList r = map charDirToStr $ getPassAsStr r
+
+	charDirToStr :: Char -> String
+	charDirToStr c =
+		case c of
+			'n' -> "North"
+			's' -> "South"
+			'e' -> "East"
+			'w' -> "West"
 
 	getPassageText :: Room -> String
 	getPassageText r
