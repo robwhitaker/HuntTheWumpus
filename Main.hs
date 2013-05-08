@@ -108,7 +108,7 @@ module Main (main) where
 			nextRooms = getAdjRooms (getRoomById (pLocation p) m) m
 			getDesc (c:cs) = 
 				case c of
-					0 -> "You feel a soft breeze eminating from somewhere in the caverns. " ++ getDesc cs
+					0 -> "You feel a soft breeze emanating from somewhere in the caverns. " ++ getDesc cs
 					1 -> "A flapping sound echoes through the tunnels. " ++ getDesc cs
 					_ -> "" ++ getDesc cs
 			getDesc _ = ""
@@ -214,7 +214,7 @@ module Main (main) where
 				  		hasArrowsText
 				  			| arrs <= 0 = ", only to realize that you have none left. You turn to run, but the Wumpus crashes into you, pinning you " ++
 				  						  "to the ground under its massive weight. Clenching your eyes, you prepare for its claws to dig into your " ++
-				  						  "abdomin. You think of your family, how you will never see them again.  You think of your village, the people "++ 
+				  						  "abdomen. You think of your family, how you will never see them again. You think of your village, the people "++ 
 				  						  "that were counting on you. The people that you have failed. And then nothing. You slowly open your eyes and see " ++
 				  						  "the Wumpus's lifeless black eye staring back into yours. Its other eye has been replaced by the shaft of your " ++
 				  						  "arrow. \n\nThe Wumpus is dead! "
@@ -235,6 +235,6 @@ module Main (main) where
 					 "against stone. "
 
 	noArrowsGameOver :: String
-	noArrowsGameOver = "As you the sound rushes in your direction, you reach for a new arrow. Your heart sinks into your " ++
-					   "stomach as you realize the quiver is empty. With a gurgling roar, the Wumpus materialized out of the darkness and " ++
+	noArrowsGameOver = "As the sound rushes in your direction, you reach for a new arrow. Your heart sinks into your " ++
+					   "stomach as you realize the quiver is empty. With a gurgling roar, the Wumpus materializes out of the darkness and " ++
 					   "digs its claws into your stomach. Your vision fades.\n\nGAME OVER.\n"
