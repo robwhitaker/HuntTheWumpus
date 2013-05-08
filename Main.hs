@@ -135,6 +135,7 @@ module Main (main) where
 			's' -> shootInto (fst currentRoomIndex + 1, snd currentRoomIndex)
 			'e' -> shootInto (fst currentRoomIndex, snd currentRoomIndex + 1)
 			'w' -> shootInto (fst currentRoomIndex , snd currentRoomIndex - 1)
+			_   -> ((p,False),False)
 		where
 			p = gPlayer gameState
 			w = gWumpus gameState
